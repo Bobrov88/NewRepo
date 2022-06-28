@@ -25,15 +25,34 @@ class list_if_ints : public container_of_ints {
 		node* pnext;
 	};
 	node* head_ = nullptr;
+	node* tail_ = nullptr;
 public:
 	int size() const override { return _size; }
 	int& at(int i) {
+		cout << "List at entered" << endl;
 		if (i > _size) throw std::out_of_range("at");
 		node* p = head_;
 		for (int j = 0; j < i; j++) p = p->pnext;
 		return p->data;
 	}
-	~list_if_ints() {};
+	void push_back(int value) {
+		node* new_tail = new node{ value, nullptr };
+		if (tail_) {
+			tail_->pnext = new_tail;
+		}
+		else {
+			head_ = new_tail;
+		}
+		tail_ = new_tail;
+		_size += 1;
+	}
+
+	~list_if_ints() {
+		for (node* next, *p = head_; p != nullptr; p = next) {
+			next = p->pnext;
+			delete p;
+		}
+	};
 };
 
 template<class ContainerModel>
@@ -63,6 +82,7 @@ int count_if(const Container& container, Predicate pred) {
 	return sum;
 }
 
+
 int main() {
 	array_of_ints arr;
 	double_each_element(arr);
@@ -73,7 +93,7 @@ int main() {
 	std::vector<double> vecd = { 1.0,2.0,3.0 };
 	double_each_element(vecd);
 	std::vector<int> v = { 3,1,4,1,5,9,2,6 };
-	assert(count(v) == 8);
+		assert(count(v) == 8);
 	int number_above =
 		count_if(v, [](int e) { return e > 5; });
 	int number_below = 
