@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+#include <cassert>
 using namespace std;
 
 class container_of_ints {
@@ -34,15 +36,48 @@ public:
 	~list_if_ints() {};
 };
 
-void double_each_element(container_of_ints& arr) {
+template<class ContainerModel>
+void double_each_element(ContainerModel& arr) {
 	for (int i = 0; i < arr.size(); i++) {
 		arr.at(i) *= 2;
 	}
 }
 
-void main() {
+template<class Container>
+int count(const Container& container) {
+	int sum = 0;
+	for (auto& elt : container) {
+		sum += 1;
+	}
+	return sum;
+}
+
+template<class Container, class Predicate>
+int count_if(const Container& container, Predicate pred) {
+	int sum = 0;
+	for (auto&& elt : container) {
+		if (pred(elt)) {
+			sum += 1;
+		}
+	}
+	return sum;
+}
+
+int main() {
 	array_of_ints arr;
 	double_each_element(arr);
 	list_if_ints lst;
 	double_each_element(lst);
+	std::vector<int> vec = { 1,2,3 };
+	double_each_element(vec);
+	std::vector<double> vecd = { 1.0,2.0,3.0 };
+	double_each_element(vecd);
+	std::vector<int> v = { 3,1,4,1,5,9,2,6 };
+	assert(count(v) == 8);
+	int number_above =
+		count_if(v, [](int e) { return e > 5; });
+	int number_below = 
+		count_if(v, [](int e) { return e < 5; });
+	assert(number_above == 2);
+	assert(number_below == 5);	
 }
