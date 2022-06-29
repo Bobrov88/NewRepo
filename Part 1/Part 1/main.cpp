@@ -87,7 +87,7 @@ void double_each_element(ContainerModel& arr) {
 }
 
 template<class Container>
-int count(const Container& container) {
+int count(Container& container) {
 	int sum = 0;
 	for (auto& elt : container) {
 		sum += 1;
