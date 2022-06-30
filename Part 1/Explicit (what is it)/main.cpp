@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>	
+#include <list>
 using namespace std;
 
 class A {
@@ -22,5 +24,18 @@ int main()
 	print(a2);
 	print(a3);
 	print(41); // This line throws with ctor(int) being declared explicit
+
+	vector<int> I{ 1,2,3,4,5,6,7,8,9 };
+	vector<bool> B{ true, true, false, false, true, true };
+	for (auto &&i : I) cout << i << " ";
+	cout << endl;
+	for (auto &&i : B) cout << i << " ";
+	int F[] = { 1,2,3,4,5,6,7,8 };
+	cout << endl;
+	for (auto i : F) cout << i << " ";
+	cout << endl;
+	list<int> L{ 1,2,3,4,5,6,7,8 };
+	for (auto &&i : L) cout << i << " ";
+	cout << endl;
 	return 0;
 }
