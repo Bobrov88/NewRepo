@@ -23,24 +23,34 @@ public:
 		list_node* pnext;
 	};
 
+	template <bool Const>
 	class list_of_ints_iterator {
-		list_node* ptr_;
 		friend class list_of_ints;
-		explicit list_of_ints_iterator(list_node* p) : ptr_(p) { }
+		friend class list_of_ints_iterator<!Const>;
+
+		using node_pointer = std::conditional_t<Const, const list_node*, list_node*>;
+		using reference = std::conditional_t<Const, const int&, int&>;
+
+		node_pointer ptr_;
+		explicit list_of_ints_iterator(node_pointer p) : ptr_(p) { }
+
 	public:
-		int& operator*() const { return ptr_->data; };
-		list_of_ints_iterator& operator++() {
-			ptr_ = ptr_->pnext; return *this;
-		}
-		list_of_ints_iterator operator++(int) {
+		reference operator*() const { return ptr_->data; };
+		auto& operator++() { ptr_ = ptr_->pnext; return *this;}
+		auto operator++(int) {
 			auto it = *this; ++* this; return it;
 		}
-		bool operator==(const list_of_ints_iterator& rhs) const {
+
+		template <bool R>
+		bool operator==(const list_of_ints_iterator<R>& rhs) const {
 			return ptr_ == rhs.ptr_;
 		}
-		bool operator!=(const list_of_ints_iterator& rhs) const {
+		template <bool R>
+		bool operator!=(const list_of_ints_iterator<R>& rhs) const {
 			return ptr_ != rhs.ptr_;
 		}
+
+		operator list_of_ints_iterator<true>() const { return list_of_ints_iterator<true>(ptr_); }
 	};
 
 	class list_of_ints /*:public container_of_ints */ {
@@ -48,9 +58,12 @@ public:
 		list_node* head_ = nullptr;
 		list_node* tail_ = nullptr;
 	public:
-		using iterator = list_of_ints_iterator;
+		using const_iterator = list_of_ints_iterator<true>;
+		using iterator = list_of_ints_iterator<false>;
 		iterator begin() { return iterator{ head_ }; }
 		iterator end() { return iterator{ nullptr }; }
+		const_iterator begin() const { return const_iterator{ head_ }; }
+		const_iterator end() const { return const_iterator{ nullptr }; }
 		int size() const /*override*/ { return _size; }
 		int& at(int i) {
 			cout << "List at entered" << endl;
