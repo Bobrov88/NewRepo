@@ -1,22 +1,24 @@
 #include <iostream>
 #include <vector>
 #include <cassert>
+#include <list>
+#include <forward_list>
 using namespace std;
 
-class container_of_ints {
-public:
-	virtual int size() const = 0;
-	virtual int& at(int i) = 0;
-};
-
-class array_of_ints : public container_of_ints {
-	int data[10]{};
-public:
-	int size() const override {
-		return 10;
-	}
-	int& at(int i) override { return data[i]; }
-};
+//class container_of_ints {
+//public:
+//	virtual int size() const = 0;
+//	virtual int& at(int i) = 0;
+//};
+//
+//class array_of_ints : public container_of_ints {
+//	int data[10]{};
+//public:
+//	int size() const override {
+//		return 10;
+//	}
+//	int& at(int i) override { return data[i]; }
+//};
 
 	struct list_node {
 		int data;
@@ -29,28 +31,35 @@ public:
 		friend class list_of_ints_iterator<!Const>;
 
 		using node_pointer = std::conditional_t<Const, const list_node*, list_node*>;
-		using reference = std::conditional_t<Const, const int&, int&>;
-
 		node_pointer ptr_;
+
 		explicit list_of_ints_iterator(node_pointer p) : ptr_(p) { }
 
 	public:
+		using difference_type = std::ptrdiff_t;
+		using value_type = int;
+		using pointer = std::conditional_t<Const, const int*, int*>;
+		using reference = std::conditional_t <Const, const int&, int&>;
+		using iterator_category = std::forward_iterator_tag;
+
 		reference operator*() const { return ptr_->data; };
-		auto& operator++() { ptr_ = ptr_->pnext; return *this;}
-		auto operator++(int) {
-			auto it = *this; ++* this; return it;
-		}
+		auto& operator++() { ptr_ = ptr_->pnext; return *this; }
+		auto operator++(int) { auto it = *this; ++* this; return it; }
 
 		template <bool R>
 		bool operator==(const list_of_ints_iterator<R>& rhs) const {
 			return ptr_ == rhs.ptr_;
 		}
+
 		template <bool R>
 		bool operator!=(const list_of_ints_iterator<R>& rhs) const {
 			return ptr_ != rhs.ptr_;
 		}
 
-		operator list_of_ints_iterator<true>() const { return list_of_ints_iterator<true>(ptr_); }
+		operator list_of_ints_iterator<true>() const
+		{
+			return list_of_ints_iterator<true>(ptr_);
+		}
 	};
 
 	class list_of_ints /*:public container_of_ints */ {
@@ -120,18 +129,35 @@ int count_if(Container& ctr, Predicate pred) {
 	return sum;
 }
 
+void foo(std::bidirectional_iterator_tag t [[maybe_unused]] )
+{
+	puts("std::vector's iterators are indeed bidirectional...");
+}
+
+void bar(std::random_access_iterator_tag)
+{
+	puts("...and random-access, too");
+}
+
+void bar(std::forward_iterator_tag)
+{
+	puts("forward_iterator_tag is not as good a match");
+}
 
 int main() {
+	using it = std::vector<int>::iterator;
+	foo(it::iterator_category{});
+	bar(it::iterator_category{});
 	//array_of_ints arr;
 	//double_each_element(arr);
-	list_of_ints lst;
-	lst.push_back(1);
+	//list_of_ints lst;
+	/*lst.push_back(1);
 	lst.push_back(2);
 	lst.push_back(3);
 	lst.push_back(-2);
-	lst.push_back(0);
+	lst.push_back(0);*/
 	//double_each_element(lst);
-	cout << count_if(lst, [](int a) { return a > 0; });
+	//cout << count_if(lst, [](int a) { return a > 0; });
 	/*std::vector<int> vec = { 1,2,3 };
 	double_each_element(vec);
 	std::vector<double> vecd = { 1.0,2.0,3.0 };
