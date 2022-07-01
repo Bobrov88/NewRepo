@@ -6,7 +6,7 @@ using namespace std;
 class A {
 public:
 	A() {};
-	A(int a) : a_{ a } {};
+	/*explicit*/ A(int a) : a_{a} {};
 	int& GetA() { return a_; };
 	int a_;
 private:
