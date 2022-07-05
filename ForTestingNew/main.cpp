@@ -5,6 +5,8 @@
 #include <list>
 #include <cassert>
 #include <numeric>
+#include <xmemory>
+#include <new>
 //----------------------------------------------------------
 //#define STD_is_base
 //#define Find_First_Of
@@ -97,9 +99,35 @@ int main()
    // std::transform(v1.begin(), v1.end(), std::back_inserter(from_v1_v2), [](int& a) {
    //    return a * 2; });
     size_t i = 0;
-//    std::fill(from_l1.begin(), from_l1.end(), i++);
-  //  std::iota(from_l1.begin(), from_l1.end(), i++);
-    std::generate(from_l1.begin(), from_l1.end(), [&]() {   return i+=2; });
+    //    std::fill(from_l1.begin(), from_l1.end(), i++);
+      //  std::iota(from_l1.begin(), from_l1.end(), i++);
+        /*std::generate(from_l1.begin(), from_l1.end(), [&]() {   return i+=rand()%12; });
+        std::sort(from_l1.begin(), from_l1.end(), [](double& element1, double& element2) {
+            return element1 > element2; });
+        std::stable_sort(from_l1.begin(), from_l1.end(), [](const double& element1, const double& element2) {
+            return element1 < element2; });
+        std::pair<int, int> Pair{ 0,1 };
+        std::cout << Pair.first << " " << Pair.second << std::endl;
+        std::swap(Pair.first, Pair.second);
+        std::cout << Pair.first << " " << Pair.second << std::endl;
+        std::reverse(l2.begin(), l2.end());*/
+    //std::partition(v1.begin(), v1.end(), [](int& element) {
+    //    return element > 0; });
+    //std::cout << std::is_partitioned(v1.begin(), v1.end(), [](int& element) {
+    //    return element > 0; }) << std::endl;
+    //std::cout << *(std::partition_point(v1.begin(), v1.end(), [](int& element) {
+    //    return element > 0; }));
+    //std::partition_copy(v1.begin(), v1.end(), v2.begin(), v3.begin(), [](int& element) {
+    //    return element > 0;});
+
+    /*std::copy_if(l1.begin(), l1.end(), from_l1.begin(), [](double& element) {
+        return element > 3; });*/
+
+    std::remove_copy_if(v1.begin(), v1.end(), from_v1_v2.begin(), [](int& element) {
+        return element > 4; });
+
+   std::cout<<*(std::rotate(v2.begin(), find(v2.begin(), v2.end(), 3), v2.end()));
+   std::next_permutation
 
 #ifdef STD_is_base
     std::cout << "is_base_of<base, base> == " << std::boolalpha
@@ -115,6 +143,7 @@ int main()
     std::string s = "hello";
     first_find_of(ii, iend, s.begin(), s.end());
 #endif // Find_First_Of
+
 
 
     return 0;
