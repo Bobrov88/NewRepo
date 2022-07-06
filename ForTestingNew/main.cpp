@@ -51,7 +51,7 @@ int main()
 {
     std::vector<int> v1{ 1,6,-5,2,-3,8,0,3,7,9,3 };
     std::vector<int> v2{ 1,6,-5,2,-3,8,0,3,7,9,3 };
-    std::vector<int> v3{ 1,8,-5,1,-2,8,4,3 };
+    std::vector<int> v3{ 1,1,-5,1,-2,8,8,3 };
 
     std::list<double> l1{ 1.5, 2.1, -6.7,0.6,4.7,2.6,2.4 };
     std::list<double> l2{ 1.5, 2.1, -6.7,0.6,4.7,2.6,2.4 };
@@ -85,7 +85,7 @@ int main()
     //assert(result.first == v1.begin()+1);
     //assert(result.second == v3.begin()+1);
 
-    std::vector<int> from_v1_v2(v1.size());
+    std::vector<int> from_v1_v2(v1.size() + v2.size());
     //std::copy(v1.begin(), v1.end(), std::back_inserter(from_v1_v2));
   //  std::copy(v1.begin(), v1.end(), from_v1_v2.begin());
     std::vector<double> from_l1(20);
@@ -111,23 +111,35 @@ int main()
         std::swap(Pair.first, Pair.second);
         std::cout << Pair.first << " " << Pair.second << std::endl;
         std::reverse(l2.begin(), l2.end());*/
-    //std::partition(v1.begin(), v1.end(), [](int& element) {
-    //    return element > 0; });
-    //std::cout << std::is_partitioned(v1.begin(), v1.end(), [](int& element) {
-    //    return element > 0; }) << std::endl;
-    //std::cout << *(std::partition_point(v1.begin(), v1.end(), [](int& element) {
-    //    return element > 0; }));
-    //std::partition_copy(v1.begin(), v1.end(), v2.begin(), v3.begin(), [](int& element) {
-    //    return element > 0;});
+        //std::partition(v1.begin(), v1.end(), [](int& element) {
+        //    return element > 0; });
+        //std::cout << std::is_partitioned(v1.begin(), v1.end(), [](int& element) {
+        //    return element > 0; }) << std::endl;
+        //std::cout << *(std::partition_point(v1.begin(), v1.end(), [](int& element) {
+        //    return element > 0; }));
+        //std::partition_copy(v1.begin(), v1.end(), v2.begin(), v3.begin(), [](int& element) {
+        //    return element > 0;});
 
-    /*std::copy_if(l1.begin(), l1.end(), from_l1.begin(), [](double& element) {
-        return element > 3; });*/
+        /*std::copy_if(l1.begin(), l1.end(), from_l1.begin(), [](double& element) {
+            return element > 3; });*/
 
-    std::remove_copy_if(v1.begin(), v1.end(), from_v1_v2.begin(), [](int& element) {
-        return element > 4; });
+            //  std::remove_copy_if(v1.begin(), v1.end(), from_v1_v2.begin(), [](int& element) {
+            //      return element > 4; });
 
-   std::cout<<*(std::rotate(v2.begin(), find(v2.begin(), v2.end(), 3), v2.end()));
-   std::next_permutation
+           //  std::cout<<*(std::rotate(v2.begin(), find(v2.begin(), v2.end(), 3), v2.end()));
+    std::vector<int> Z{ 1,2,3 };
+    std::vector <std::vector<int>> ZZ;
+    for (size_t i = 0; i < 6; i++) {
+        ZZ.push_back(Z);
+        std::next_permutation(Z.begin(), Z.end());
+    }
+
+    //  std::cout<<std::lexicographical_compare(v1.begin(), v1.end(), v2.begin(), v2.end());
+
+     // std::make_heap(v2.begin(), v2.end());
+     // std::push_heap(v2.begin(), v2.end());
+     // std::pop_heap(v2.begin(), v2.end());
+   //   std::sort(v2.begin(), v2.end());
 
 #ifdef STD_is_base
     std::cout << "is_base_of<base, base> == " << std::boolalpha
@@ -143,8 +155,22 @@ int main()
     std::string s = "hello";
     first_find_of(ii, iend, s.begin(), s.end());
 #endif // Find_First_Of
-
-
-
+    //  std::iter_swap(v1.begin(), find(v1.begin(), v1.end(), 0));
+    auto pos = find(v1.begin(), v1.end(), 8);
+    //std::sort(v1.begin(), pos);
+    //std::sort(pos, v1.end());
+    //std::inplace_merge(v1.begin(), pos, v1.end());
+   // std::sort(v1.begin(), v1.end());
+    //std::sort(v2.begin(), v2.end());
+    // std::merge(v1.begin(), v1.end(), v2.begin(), v2.end(), from_v1_v2.begin());
+   // std::cout << *(std::lower_bound(v1.begin(), v1.end(), 4))<<std::endl;
+   // std::cout << *(std::upper_bound(v1.begin(), v1.end(), 1))<<std::endl;
+    v1.erase(std::remove_if(v1.begin(), v1.end(), [](int& element) {
+        return element % 3 == 0; }), v1.end());
+    std::cout << v1.size() << std::endl;
+    std::cout << v3.size() << std::endl;
+    v3.erase(std::unique(v3.begin(), v3.end()),v3.end());
+    //v3.erase(std::unique(v3.begin(), v3.end()), v3.end());
+    std::cout << v3.size() << std::endl;
     return 0;
 }
