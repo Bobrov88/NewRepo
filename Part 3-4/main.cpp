@@ -54,8 +54,9 @@ public:
 		v.reserve(2); v.at(0) = 0;
 	};
 	_CreateVector(T _begin, T _end, size_t _number_of_values) {
+		if (_end - _begin == 0) ++_end;
 		srand(time(NULL));
-		v.reserve(_number_of_values);
+		v.resize(_number_of_values);
 		while (_number_of_values) {
 			v.emplace_back(rand() % (_end - _begin) + _begin);
 			--_number_of_values;
@@ -67,6 +68,18 @@ public:
 			_other_obj.v.end(),
 			this->v.begin());
 	}
+	_CreateVector(const _CreateVector&& _other_obj) noexcept{
+		this->v.resize(_other_obj.v.size());
+		std::move(_other_obj.v.begin(),
+			_other_obj.v.end(),
+			this->v.begin());
+	}
+
+	_CreateVector& operator+(const _CreateVector& _other_obj) {
+		auto begin = this->v.begin();
+		std::merge(this->v.begin(), this->v.end(), _other_obj.v.begin(), _other_obj.v.end(), begin);
+		return *this;
+	}
 
 private:
 	std::vector<T> v;
@@ -76,6 +89,7 @@ int main() {
 
 	_CreateVector<int> _CVI(10,20,6);
 	_CreateVector<int> _CVI_copy(_CVI);
+	_CreateVector<int> _CVI_move = _CreateVector(20, 20, 5) + _CreateVector(10, 20, 4);
 	/*std::array<int, 3> A{ 1,2,3 };
 	std::array<int, 3> B{ 4,5,6 };
 	auto C = cross_product(A, B);*/
