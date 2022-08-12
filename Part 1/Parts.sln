@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Part 5", "..\Part 5\Part 5.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Containers", "..\Containers\Containers.vcxproj", "{35E2EB85-EE0C-45F9-B6AB-A766E7F3D983}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Self-control", "..\Self-control\Self-control.vcxproj", "{AB6AE04A-17E6-4CC6-A2EF-21FA17258E32}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -81,6 +83,14 @@ Global
 		{35E2EB85-EE0C-45F9-B6AB-A766E7F3D983}.Release|x64.Build.0 = Release|x64
 		{35E2EB85-EE0C-45F9-B6AB-A766E7F3D983}.Release|x86.ActiveCfg = Release|Win32
 		{35E2EB85-EE0C-45F9-B6AB-A766E7F3D983}.Release|x86.Build.0 = Release|Win32
+		{AB6AE04A-17E6-4CC6-A2EF-21FA17258E32}.Debug|x64.ActiveCfg = Debug|x64
+		{AB6AE04A-17E6-4CC6-A2EF-21FA17258E32}.Debug|x64.Build.0 = Debug|x64
+		{AB6AE04A-17E6-4CC6-A2EF-21FA17258E32}.Debug|x86.ActiveCfg = Debug|Win32
+		{AB6AE04A-17E6-4CC6-A2EF-21FA17258E32}.Debug|x86.Build.0 = Debug|Win32
+		{AB6AE04A-17E6-4CC6-A2EF-21FA17258E32}.Release|x64.ActiveCfg = Release|x64
+		{AB6AE04A-17E6-4CC6-A2EF-21FA17258E32}.Release|x64.Build.0 = Release|x64
+		{AB6AE04A-17E6-4CC6-A2EF-21FA17258E32}.Release|x86.ActiveCfg = Release|Win32
+		{AB6AE04A-17E6-4CC6-A2EF-21FA17258E32}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -8,12 +9,55 @@
 #include <map>
 #include <functional>
 #include <unordered_map>
-//using namespace std;
+#include <set>
+#include <stack>
+#include <stdexcept>
+#include <cmath>
+#include <sstream>
+using namespace std;
 
 //void insert_sorted(vector<string>& v, const string& word) {
 //	const auto insert_pos(lower_bound(begin(v), end(v), word));
 //	v.insert(insert_pos, word);
 //}
+
+template <typename IT>
+double evaluate_rpn(IT it, IT end) {
+	stack<double> val_stack;
+	auto pop_stack([&]() {
+		auto r(val_stack.top());
+		val_stack.pop();
+		return r;
+		});
+	map < string, double(*)(double, double)> ops{
+		{ "+", [](double a, double b) {return a + b; } },
+		{ "-", [](double a, double b) {return a - b; } },
+		{ "*", [](double a, double b) {return a * b; } },
+		{ "/", [](double a, double b) {return a / b; } },
+		{ "^", [](double a, double b) {return pow(a,b); } },
+		{ "%", [](double a, double b) {return fmod(a,b); } }
+			};
+	for (; it != end; ++it) {
+		stringstream ss{ *it };
+		if (double val; ss >> val) {
+			val_stack.push(val);
+		}
+		else {
+			const auto r{ pop_stack() };
+			const auto l{ pop_stack() };
+			try {
+				const auto& op(ops.at(*it));
+				//cout << typeid(op).name();
+				const double result(op(l, r));
+				val_stack.push(result);
+			}
+			catch (const out_of_range&) {
+				throw invalid_argument(*it);
+			}
+		}
+	}
+	return val_stack.top();
+}
 
 //struct billionaire {
 //	string name;
@@ -28,26 +72,27 @@
 //		cout << placement << ": " << driver << "\n";
 //	}
 //}
-struct coord {
-	int x;
-	int y;
-};
 
-bool operator==(const coord& l, const coord& r) {
-	return l.x == r.x && l.y == r.y;
-}
+//struct coord {
+//	int x;
+//	int y;
+//};
 
-namespace std {
-	template <>
-	struct hash<coord> {
-		using argument_type = coord;
-		using result_type = size_t;
-		result_type operator()(const argument_type& c) const {
-			return static_cast<result_type>(c.x)
-				+ static_cast<result_type>(c.y);
-		}
-	};
-}
+//bool operator==(const coord& l, const coord& r) {
+//	return l.x == r.x && l.y == r.y;
+//}
+
+//namespace std {
+//	template <>
+//	struct hash<coord> {
+//		using argument_type = coord;
+//		using result_type = size_t;
+//		result_type operator()(const argument_type& c) const {
+//			return static_cast<result_type>(c.x)
+//				+ static_cast<result_type>(c.y);
+//		}
+//	};
+//}
 
 
 
@@ -128,13 +173,37 @@ int main()
 	//}
 	//print(race_placement);
 
-	std::unordered_map<coord, int> m{
-		{{0,0},1},
-		{{0,1},2},
-		{{2,1},3}
-	};
-	for (const auto& [key, value] : m) {
-		std::cout << "((" << key.x << "," << key.y << "):" << value << ") ";
+	//std::unordered_map<coord, int> m{
+	//	{{0,0},1},
+	//	{{0,1},2},
+	//	{{2,1},3}
+	//};
+	//for (const auto& [key, value] : m) {
+	//	std::cout << "((" << key.x << "," << key.y << "):" << value << ") ";
+	//}
+
+	//set<string> s;
+	ifstream file("1.txt");
+	//if (file.is_open())
+	//{
+	//	istream_iterator<string> it{ file };
+	//	istream_iterator<string> end;
+	//	copy(it, end, inserter(s, s.end()));
+	//}
+	//else cout << "File not found!" << endl;
+	//for (const auto &word : s) {
+	//	cout << word << " ";
+	//}
+	//cout << "\n";
+
+	try {
+		cout << evaluate_rpn(istream_iterator<string> {file}, {}) << endl;
 	}
+	catch (const invalid_argument& e) {
+		cout << "Invalid argument: " << e.what() << "\n";
+	}
+
+	file.close();
+
 	return 0;
 }
