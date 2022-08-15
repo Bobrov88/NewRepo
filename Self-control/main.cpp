@@ -7,6 +7,7 @@
 #include <list>
 #include <string>
 #include <map>
+#include <set>
 using namespace std;
 
 //#define ERASE_REMOVE
@@ -16,6 +17,8 @@ using namespace std;
 //#define SAFE_IMSERT_INTO_MAP
 //#define HINTS
 //#define CHANGE_KEYS
+//#define SELFMADE_TYPE
+//#define INSERT_UNIQUE
 
 #ifdef  ERASE_REMOVE
 struct coord {
@@ -31,6 +34,39 @@ struct birthday {
 	size_t age;
 };
 #endif // SAFE_IMSERT_INTO_MAP
+
+#ifdef SELFMADE_TYPE
+struct attribute {
+	float temperature;
+	float pressure;
+	float volume;
+};
+
+bool operator==(const attribute& l, const attribute& r) {
+	return	l.pressure == r.pressure		&&
+			l.temperature == r.temperature	&&
+			l.volume == r.volume;
+}
+bool operator<(const attribute& l, const attribute& r) {
+	return	l.pressure < r.pressure;
+}
+
+namespace std {
+	template<>
+	struct hash<attribute> {
+		using argument_type = attribute;
+		using result_type = float;
+		result_type operator()(const argument_type& obj) const {
+			return	static_cast<result_type>(obj.pressure) +
+				static_cast<result_type>(obj.temperature) +
+				static_cast<result_type>(obj.volume);
+		}
+	};
+}
+
+#endif // SELFMADE_TYPE
+
+
 
 
 int main() {
@@ -157,6 +193,32 @@ int main() {
 
 #endif // CHANGE_KEYS
 
-
+#ifdef SELFMADE_TYPE
+	map<attribute, size_t> water{
+		{{4.5,67.3,20}, 1},
+		{{8.2,96.4, 100.4}, 2},
+		{{2.5,51.4,3.4}, 3}
+	};
+	for (const auto& el : water) {
+		cout << el.first.pressure <<
+			" - " << el.first.temperature <<
+			" - " << el.first.volume << endl;
+	}
 	return 0;
+#endif // SELFMADE_TYPE
+
+#ifdef INSERT_UNIQUE
+	fstream file("1.txt");
+	set<string> listing;
+	if (!file.is_open()) return 0;
+	istream_iterator<string> ss { file };
+	istream_iterator<string> end;
+	copy(ss, end, inserter(listing, listing.end()));
+	for (const auto& el : listing) {
+		cout << el << " ";
+	}
+	file.close();
+	return 0;
+#endif // INSERT_UNIQUE
+
 }
