@@ -8,6 +8,8 @@
 #include <string>
 #include <map>
 #include <set>
+#include <stdexcept>
+#include <stack>
 using namespace std;
 
 //#define ERASE_REMOVE
@@ -19,6 +21,7 @@ using namespace std;
 //#define CHANGE_KEYS
 //#define SELFMADE_TYPE
 //#define INSERT_UNIQUE
+//#define OPN
 
 #ifdef  ERASE_REMOVE
 struct coord {
@@ -220,5 +223,37 @@ int main() {
 	file.close();
 	return 0;
 #endif // INSERT_UNIQUE
+
+#ifdef OPN
+	map<string, double (*)(const double, const double)> operations{
+		{"+", [](const double l, const double r) {return l + r; }},
+		{"-", [](const double l, const double r) {return l - r; }},
+		{"*", [](const double l, const double r) {return l * r; }},
+		{"/", [](const double l, const double r) {return l / r; }},
+		{"^", [](const double l, const double r) {return pow(l,r); }},
+		{"%", [](const double l, const double r) {return fmod(l,r); }}
+	};
+
+	ifstream file("2.txt");
+	if (!file.is_open()) return 0;
+	stack<double> vars;
+	istream_iterator<string> IT{ file };
+	istream_iterator<string> end{ };
+	for (; IT != end; IT++) {
+		stringstream ss{ *IT };
+		if (double var; ss >> var) {
+			vars.push(var);
+		}
+		else {
+			const auto r{ vars.top() };
+			vars.pop();
+			const auto l{ vars.top() };
+			vars.pop();
+			vars.push(operations.at(*IT)(l, r));
+		}
+	}
+	cout << "Result: " << vars.top();
+	return 0;
+#endif // OPN
 
 }

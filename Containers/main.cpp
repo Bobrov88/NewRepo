@@ -14,6 +14,9 @@
 #include <stdexcept>
 #include <cmath>
 #include <sstream>
+#include <iomanip>
+#include <queue>
+#include <tuple>
 using namespace std;
 
 //void insert_sorted(vector<string>& v, const string& word) {
@@ -21,43 +24,43 @@ using namespace std;
 //	v.insert(insert_pos, word);
 //}
 
-template <typename IT>
-double evaluate_rpn(IT it, IT end) {
-	stack<double> val_stack;
-	auto pop_stack([&]() {
-		auto r(val_stack.top());
-		val_stack.pop();
-		return r;
-		});
-	map < string, double(*)(double, double)> ops{
-		{ "+", [](double a, double b) {return a + b; } },
-		{ "-", [](double a, double b) {return a - b; } },
-		{ "*", [](double a, double b) {return a * b; } },
-		{ "/", [](double a, double b) {return a / b; } },
-		{ "^", [](double a, double b) {return pow(a,b); } },
-		{ "%", [](double a, double b) {return fmod(a,b); } }
-			};
-	for (; it != end; ++it) {
-		stringstream ss{ *it };
-		if (double val; ss >> val) {
-			val_stack.push(val);
-		}
-		else {
-			const auto r{ pop_stack() };
-			const auto l{ pop_stack() };
-			try {
-				const auto& op(ops.at(*it));
-				//cout << typeid(op).name();
-				const double result(op(l, r));
-				val_stack.push(result);
-			}
-			catch (const out_of_range&) {
-				throw invalid_argument(*it);
-			}
-		}
-	}
-	return val_stack.top();
-}
+//template <typename IT>
+//double evaluate_rpn(IT it, IT end) {
+//	stack<double> val_stack;
+//	auto pop_stack([&]() {
+//		auto r(val_stack.top());
+//		val_stack.pop();
+//		return r;
+//		});
+//	map < string, double(*)(double, double)> ops{
+//		{ "+", [](double a, double b) {return a + b; } },
+//		{ "-", [](double a, double b) {return a - b; } },
+//		{ "*", [](double a, double b) {return a * b; } },
+//		{ "/", [](double a, double b) {return a / b; } },
+//		{ "^", [](double a, double b) {return pow(a,b); } },
+//		{ "%", [](double a, double b) {return fmod(a,b); } }
+//			};
+//	for (; it != end; ++it) {
+//		stringstream ss{ *it };
+//		if (double val; ss >> val) {
+//			val_stack.push(val);
+//		}
+//		else {
+//			const auto r{ pop_stack() };
+//			const auto l{ pop_stack() };
+//			try {
+//				const auto& op(ops.at(*it));
+//				//cout << typeid(op).name();
+//				const double result(op(l, r));
+//				val_stack.push(result);
+//			}
+//			catch (const out_of_range&) {
+//				throw invalid_argument(*it);
+//			}
+//		}
+//	}
+//	return val_stack.top();
+//}
 
 //struct billionaire {
 //	string name;
@@ -94,7 +97,38 @@ double evaluate_rpn(IT it, IT end) {
 //	};
 //}
 
+//string filter_punctuation(const string &s) {
+//	const char* forbidden{ ".,:; " };
+//	const auto idx_start(s.find_first_not_of(forbidden));
+//	const auto idx_end(s.find_last_not_of(forbidden));
+//	return s.substr(idx_start, idx_end - idx_start + 1);
+//	}
 
+//string filter_ws(const string& s) {
+//	const char* ws{ " \r\n\t" };
+//	const auto a(s.find_first_not_of(ws));
+//	const auto b(s.find_last_not_of(ws));
+//	if (a == string::npos) { return {}; }
+//	return s.substr(a, b - a + 1);
+//}
+//
+//multimap<size_t, string> get_sentence_stats(const string& content) {
+//	multimap<size_t, string> ret;
+//	const auto end_it(end(content));
+//	auto it1(begin(content));
+//	auto it2(find(it1, end_it, '.'));
+//	while (it1 != end_it && distance(it1, it2) > 0) {
+//		string s{ filter_ws({it1,it2}) };
+//		if (s.length() > 0) {
+//			const auto words(count(begin(s), end(s), ' ') + 1);
+//			ret.emplace(make_pair(words, move(s)));
+//		}
+//		if (it2 == end_it) break;
+//		it1 = next(it2, 1);
+//		it2 = find(it1, end_it, '.');
+//	}
+//	return ret;
+//}
 
 int main()
 {
@@ -181,10 +215,10 @@ int main()
 	//for (const auto& [key, value] : m) {
 	//	std::cout << "((" << key.x << "," << key.y << "):" << value << ") ";
 	//}
-
+	
 	//set<string> s;
 	ifstream file("1.txt");
-	//if (file.is_open())
+	if (!file.is_open()) return -5;
 	//{
 	//	istream_iterator<string> it{ file };
 	//	istream_iterator<string> end;
@@ -195,15 +229,58 @@ int main()
 	//	cout << word << " ";
 	//}
 	//cout << "\n";
+		//try {
+	//	cout << evaluate_rpn(istream_iterator<string> {file}, {}) << endl;
+	//}
+	//catch (const invalid_argument& e) {
+	//	cout << "Invalid argument: " << e.what() << "\n";
+	//}
+	using item_type = std::pair<int, std::string>;
+	priority_queue<item_type> q;
+	initializer_list<item_type> il{
+		{1, "dishes"},
+		{0, "watch TV"},
+		{0, "read comics"},
+		{2, "do homework"}
+	};
+	for (auto & el : il) {
+		q.push(el);
+	}
+	while (!q.empty()) {
+		cout << q.top().first << ": " << q.top().second << endl;
+		q.pop();
+	}
+	cout << endl;
 
-	try {
-		cout << evaluate_rpn(istream_iterator<string> {file}, {}) << endl;
-	}
-	catch (const invalid_argument& e) {
-		cout << "Invalid argument: " << e.what() << "\n";
-	}
+	//file.unsetf(ios::skipws);
+	//string content(istream_iterator<char>{file}, {});
+	//for (const auto& [word_count, sentence] : get_sentence_stats(content)) {
+	//	cout << word_count << " words: " << sentence << ".\n";
+	//}
 
 	file.close();
+
+	//ifstream file("1.txt");
+	//if (!file.is_open()) return 0;
+	//map<string, size_t> words;
+	//int max_word_len{ 0 };
+	//string s;
+	//while (file >> s) {
+	//	auto filtered(filter_punctuation(s));
+	//	max_word_len = max<int>(max_word_len, filtered.length());
+	//	++words[filtered];
+	//}
+	//vector < pair<string, size_t>> word_counts;
+	//word_counts.reserve(words.size());
+	//move(begin(words), end(words), back_inserter(word_counts));
+	//sort(begin(word_counts), end(word_counts), [](const auto& a, const auto& b) {
+	//	return a.second > b.second;
+	//	});
+	//cout << "# " << setw(max_word_len) << "<WORD>" << " #<COUNT>\n";
+	//for (const auto& [word, count] : word_counts) {
+	//	cout << setw(static_cast<streamsize>(max_word_len + 2)) << word << " #" << count << "\n";
+	//}
+	//file.close();
 
 	return 0;
 }
