@@ -10,6 +10,7 @@
 #include <set>
 #include <stdexcept>
 #include <stack>
+#include <queue>
 using namespace std;
 
 //#define ERASE_REMOVE
@@ -22,6 +23,18 @@ using namespace std;
 //#define SELFMADE_TYPE
 //#define INSERT_UNIQUE
 //#define OPN
+//#define WORDS_IN_FILE
+//#define TEXT_STYLE
+//#define PRIORITY_QUEUE
+
+#ifdef WORDS_IN_FILE
+string _Trim(string& word) {
+	const char* symbols{ ",.:;()-" };
+	auto _begin(word.find_first_not_of(symbols));
+	auto _end(word.find_last_not_of(symbols));
+	return word.substr(_begin, _end - _begin + 1);
+	}
+#endif // WORDS_IN_FILE
 
 #ifdef  ERASE_REMOVE
 struct coord {
@@ -69,8 +82,22 @@ namespace std {
 
 #endif // SELFMADE_TYPE
 
+#ifdef TEXT_STYLE
 
+string _trim_sentence(string& sentence) {
+	const char* symbols{ " \r\n\t" };
+	auto _begin(sentence.find_first_not_of(symbols));
+	auto _end(sentence.find_last_not_of(symbols));
+	return sentence.substr(_begin, _end - _begin + 1);
+}
 
+map<string, size_t> get_sentence_statistics(string& sentence) {
+	map<string, size_t> m;
+	sentence = _trim_sentence(sentence);
+	m[sentence] = count(sentence.begin(), sentence.end(), ' ') + 1;
+	return m;
+}
+#endif // TEXT_STYLE
 
 int main() {
 #ifdef ERASE_REMOVE
@@ -255,5 +282,65 @@ int main() {
 	cout << "Result: " << vars.top();
 	return 0;
 #endif // OPN
+
+#ifdef WORDS_IN_FILE
+ifstream file("1.txt");
+if (!file.is_open()) return -2;
+map <string, size_t> words;
+istream_iterator<string> it1{ file };
+istream_iterator<string> end;
+for (; it1 != end; ++it1) {
+	string word{*it1};
+	++words[_Trim(word)];
+}
+
+vector<pair<string, size_t>> v;
+v.reserve(words.size());
+move(begin(words), std::end(words), back_inserter(v));
+sort(begin(v), std::end(v), [](auto& a, auto& b) {
+	return a.second > b.second;
+	});
+for (auto& el : v) {
+	cout << el.first << " - " << el.second << endl;
+}
+file.close();
+return 0;
+#endif // WORDS_IN_FILE
+
+#ifdef TEXT_STYLE
+ifstream file("1.txt");
+if (!file.is_open()) return -2;
+file.unsetf(ios::skipws);
+istream_iterator<char> iss{ file };
+istream_iterator<char> end;
+string sentence {iss, end};
+auto it_begin = sentence.begin();
+auto it_dot = find(it_begin, sentence.end(), '.');
+while (it_dot != sentence.end()) {
+	string one_sentence({ it_begin, it_dot });
+	map<string, size_t> sentences_encounting = get_sentence_statistics(one_sentence);
+	cout << one_sentence << " - " << sentences_encounting[one_sentence] << endl;
+	it_begin = next(it_dot,1);
+	it_dot = find(it_begin, sentence.end(), '.');
+}
+
+file.close();
+#endif // TEXT_STYLE
+
+#ifdef PRIORITY_QUEUE
+initializer_list<pair<size_t, string>> _il{
+	{0,"Serik"},
+	{0, "Leonid"},
+	{2, "Latypov"},
+	{1, "Dobriy"},
+	{3, "Labazan"}
+};
+priority_queue<pair<size_t, string>> _pq;
+for (const auto &el : _il) _pq.push(el);
+while (!_pq.empty()) {
+	cout << _pq.top().first << " - " << _pq.top().second << endl;
+	_pq.pop();
+}
+#endif // PRIORITY_QUEUE
 
 }

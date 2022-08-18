@@ -104,31 +104,31 @@ using namespace std;
 //	return s.substr(idx_start, idx_end - idx_start + 1);
 //	}
 
-//string filter_ws(const string& s) {
-//	const char* ws{ " \r\n\t" };
-//	const auto a(s.find_first_not_of(ws));
-//	const auto b(s.find_last_not_of(ws));
-//	if (a == string::npos) { return {}; }
-//	return s.substr(a, b - a + 1);
-//}
-//
-//multimap<size_t, string> get_sentence_stats(const string& content) {
-//	multimap<size_t, string> ret;
-//	const auto end_it(end(content));
-//	auto it1(begin(content));
-//	auto it2(find(it1, end_it, '.'));
-//	while (it1 != end_it && distance(it1, it2) > 0) {
-//		string s{ filter_ws({it1,it2}) };
-//		if (s.length() > 0) {
-//			const auto words(count(begin(s), end(s), ' ') + 1);
-//			ret.emplace(make_pair(words, move(s)));
-//		}
-//		if (it2 == end_it) break;
-//		it1 = next(it2, 1);
-//		it2 = find(it1, end_it, '.');
-//	}
-//	return ret;
-//}
+string filter_ws(const string& s) {
+	const char* ws{ " \r\n\t" };
+	const auto a(s.find_first_not_of(ws));
+	const auto b(s.find_last_not_of(ws));
+	if (a == string::npos) { return {}; }
+	return s.substr(a, b - a + 1);
+}
+
+multimap<size_t, string> get_sentence_stats(const string& content) {
+	multimap<size_t, string> ret;
+	const auto end_it(end(content));
+	auto it1(begin(content));
+	auto it2(find(it1, end_it, '.'));
+	while (it1 != end_it && distance(it1, it2) > 0) {
+		string s{ filter_ws({it1,it2}) };
+		if (s.length() > 0) {
+			const auto words(count(begin(s), end(s), ' ') + 1);
+			ret.emplace(make_pair(words, move(s)));
+		}
+		if (it2 == end_it) break;
+		it1 = next(it2, 1);
+		it2 = find(it1, end_it, '.');
+	}
+	return ret;
+}
 
 int main()
 {
@@ -219,44 +219,44 @@ int main()
 	//set<string> s;
 	ifstream file("1.txt");
 	if (!file.is_open()) return -5;
-	//{
-	//	istream_iterator<string> it{ file };
-	//	istream_iterator<string> end;
-	//	copy(it, end, inserter(s, s.end()));
+	////{
+	////	istream_iterator<string> it{ file };
+	////	istream_iterator<string> end;
+	////	copy(it, end, inserter(s, s.end()));
+	////}
+	////else cout << "File not found!" << endl;
+	////for (const auto &word : s) {
+	////	cout << word << " ";
+	////}
+	////cout << "\n";
+	//	//try {
+	////	cout << evaluate_rpn(istream_iterator<string> {file}, {}) << endl;
+	////}
+	////catch (const invalid_argument& e) {
+	////	cout << "Invalid argument: " << e.what() << "\n";
+	////}
+	//using item_type = std::pair<int, std::string>;
+	//priority_queue<item_type> q;
+	//initializer_list<item_type> il{
+	//	{1, "dishes"},
+	//	{0, "watch TV"},
+	//	{0, "read comics"},
+	//	{2, "do homework"}
+	//};
+	//for (auto & el : il) {
+	//	q.push(el);
 	//}
-	//else cout << "File not found!" << endl;
-	//for (const auto &word : s) {
-	//	cout << word << " ";
+	//while (!q.empty()) {
+	//	cout << q.top().first << ": " << q.top().second << endl;
+	//	q.pop();
 	//}
-	//cout << "\n";
-		//try {
-	//	cout << evaluate_rpn(istream_iterator<string> {file}, {}) << endl;
-	//}
-	//catch (const invalid_argument& e) {
-	//	cout << "Invalid argument: " << e.what() << "\n";
-	//}
-	using item_type = std::pair<int, std::string>;
-	priority_queue<item_type> q;
-	initializer_list<item_type> il{
-		{1, "dishes"},
-		{0, "watch TV"},
-		{0, "read comics"},
-		{2, "do homework"}
-	};
-	for (auto & el : il) {
-		q.push(el);
-	}
-	while (!q.empty()) {
-		cout << q.top().first << ": " << q.top().second << endl;
-		q.pop();
-	}
-	cout << endl;
+	//cout << endl;
 
-	//file.unsetf(ios::skipws);
-	//string content(istream_iterator<char>{file}, {});
-	//for (const auto& [word_count, sentence] : get_sentence_stats(content)) {
-	//	cout << word_count << " words: " << sentence << ".\n";
-	//}
+	file.unsetf(ios::skipws);
+	string content(istream_iterator<char>{file}, {});
+	for (const auto& [word_count, sentence] : get_sentence_stats(content)) {
+		cout << word_count << " words: " << sentence << ".\n";
+	}
 
 	file.close();
 
