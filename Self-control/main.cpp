@@ -16,7 +16,6 @@ using namespace std;
 //#define ERASE_REMOVE
 //#define DELETING_O1
 //#define QUICK_SAFE_ACCESS
-//#define SAVE_SORTED
 //#define SAFE_IMSERT_INTO_MAP
 //#define HINTS
 //#define CHANGE_KEYS

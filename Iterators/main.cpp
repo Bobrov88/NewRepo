@@ -5,11 +5,17 @@
 #include <iterator>
 #include <sstream>
 #include <deque>
+#include <iterator>
+#include <list>
 using namespace std;
 
 //#define simple_iterator
 //#define iterator_to_stl
-#define iterator_adapters
+//#define FIBONACCI
+//#define iterator_adapters
+//#define reverse_iterator
+#define iterator_stopper
+
 #ifdef iterator_to_stl
 class num_iterator {
 	int i;
@@ -72,9 +78,74 @@ public:
 };
 #endif // simple_iterator
 
+#ifdef FIBONACCI
+class fib_it {
+	size_t i{ 0 };
+	size_t a{ 0 };
+	size_t b{ 1 };
+public:
+	fib_it() = default;
+	explicit fib_it(size_t i_) : i(i_) {}
+	size_t operator*() const { return b; }
+	fib_it& operator++() {
+		const size_t old_b{ b };
+		b += a;
+		a = old_b;
+		++i;
+		return *this;
+	}
+	bool operator!=(const fib_it& o) const { return i != o.i; }
+};
 
-int main()
+class fib_range {
+	size_t end_n;
+public:
+	fib_range(size_t end_n_) : end_n(end_n_) {}
+	fib_it begin() const { return fib_it{}; }
+	fib_it end() const { return fib_it{ end_n }; }
+};
+#endif // FIBONACCI
+
+#ifdef iterator_stopper
+class cstring_iterator_sentinel {};
+class cstring_iterator {
+	const char* s{ nullptr };
+public:
+	explicit cstring_iterator(const char* str) :s(str) {}
+	char operator*() const { return *s; };
+	cstring_iterator& operator++() {
+		++s;
+		return *this;
+	}
+	bool operator!=(const cstring_iterator_sentinel) const {
+		return s != nullptr && *s != '\0';
+	}
+};
+
+class cstring_range {
+	const char* s{ nullptr };
+public:
+	cstring_range(const char* str) : s{ str } {}
+	cstring_iterator begin() const {
+		return cstring_iterator{ s };
+	}
+	cstring_iterator_sentinel end() const {
+		return {};
+	}
+};
+#endif // iterator_stopper
+
+
+int main(int argc, char **argv)
 {
+	if (argc < 2) {
+		cout << "Please provide one parameter!" << endl;
+		return 1;
+	}
+	for (char c : cstring_range(argv[1])) {
+		cout << c;
+	}
+
 	ifstream file ("3.txt");
 	if (!file.is_open()) return -1;
 #ifdef simple_iterator
@@ -101,5 +172,21 @@ int main()
 	copy(begin(v), end(v), ostream_iterator<int>{cout, ", "});
 	cout << endl;
 #endif // iterator_adapters
+#ifdef FIBONACCI
+	for (size_t i : fib_range{ 10 }) {
+		cout << i << ", ";
+	}
+	cout << endl;
+	return 0;
+#endif // FIBONACCI
+#ifdef reverse_iterator
+	list<int> l{ 1,2,3,4,5 };
+	copy(rbegin(l), rend(l), ostream_iterator<int>(cout, ", "));
+	cout << endl;
+	copy(make_reverse_iterator(end(l)),
+		make_reverse_iterator(begin(l)),
+		ostream_iterator<int>(cout, ", "));
+	cout << endl;
+#endif // reverse_iterator
 
 }
