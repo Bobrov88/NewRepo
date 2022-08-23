@@ -25,80 +25,167 @@ using namespace std;
 //#define WORDS_IN_FILE
 //#define TEXT_STYLE
 //#define PRIORITY_QUEUE
+//#define MY_RANGE
+//#define COMPATIBLE_ITERATOR
 
+namespace self_copntrol {
 #ifdef WORDS_IN_FILE
-string _Trim(string& word) {
-	const char* symbols{ ",.:;()-" };
-	auto _begin(word.find_first_not_of(symbols));
-	auto _end(word.find_last_not_of(symbols));
-	return word.substr(_begin, _end - _begin + 1);
+	string _Trim(string & word) {
+		const char* symbols{ ",.:;()-" };
+		auto _begin(word.find_first_not_of(symbols));
+		auto _end(word.find_last_not_of(symbols));
+		return word.substr(_begin, _end - _begin + 1);
 	}
 #endif // WORDS_IN_FILE
 
 #ifdef  ERASE_REMOVE
-struct coord {
-	double x;
-	double y;
-};
+	struct coord {
+		double x;
+		double y;
+	};
 #endif //  ERASE_REMOVE
 
 #ifdef SAFE_IMSERT_INTO_MAP
-struct birthday {
-	string name;
-	string month;
-	size_t age;
-};
+	struct birthday {
+		string name;
+		string month;
+		size_t age;
+	};
 #endif // SAFE_IMSERT_INTO_MAP
 
 #ifdef SELFMADE_TYPE
-struct attribute {
-	float temperature;
-	float pressure;
-	float volume;
-};
-
-bool operator==(const attribute& l, const attribute& r) {
-	return	l.pressure == r.pressure		&&
-			l.temperature == r.temperature	&&
-			l.volume == r.volume;
-}
-bool operator<(const attribute& l, const attribute& r) {
-	return	l.pressure < r.pressure;
-}
-
-namespace std {
-	template<>
-	struct hash<attribute> {
-		using argument_type = attribute;
-		using result_type = float;
-		result_type operator()(const argument_type& obj) const {
-			return	static_cast<result_type>(obj.pressure) +
-				static_cast<result_type>(obj.temperature) +
-				static_cast<result_type>(obj.volume);
-		}
+	struct attribute {
+		float temperature;
+		float pressure;
+		float volume;
 	};
-}
+
+	bool operator==(const attribute & l, const attribute & r) {
+		return	l.pressure == r.pressure &&
+			l.temperature == r.temperature &&
+			l.volume == r.volume;
+	}
+	bool operator<(const attribute & l, const attribute & r) {
+		return	l.pressure < r.pressure;
+	}
+
+	namespace std {
+		template<>
+		struct hash<attribute> {
+			using argument_type = attribute;
+			using result_type = float;
+			result_type operator()(const argument_type& obj) const {
+				return	static_cast<result_type>(obj.pressure) +
+					static_cast<result_type>(obj.temperature) +
+					static_cast<result_type>(obj.volume);
+			}
+		};
+	}
 
 #endif // SELFMADE_TYPE
 
 #ifdef TEXT_STYLE
 
-string _trim_sentence(string& sentence) {
-	const char* symbols{ " \r\n\t" };
-	auto _begin(sentence.find_first_not_of(symbols));
-	auto _end(sentence.find_last_not_of(symbols));
-	return sentence.substr(_begin, _end - _begin + 1);
-}
+	string _trim_sentence(string & sentence) {
+		const char* symbols{ " \r\n\t" };
+		auto _begin(sentence.find_first_not_of(symbols));
+		auto _end(sentence.find_last_not_of(symbols));
+		return sentence.substr(_begin, _end - _begin + 1);
+	}
 
-map<string, size_t> get_sentence_statistics(string& sentence) {
-	map<string, size_t> m;
-	sentence = _trim_sentence(sentence);
-	m[sentence] = count(sentence.begin(), sentence.end(), ' ') + 1;
-	return m;
-}
+	map<string, size_t> get_sentence_statistics(string & sentence) {
+		map<string, size_t> m;
+		sentence = _trim_sentence(sentence);
+		m[sentence] = count(sentence.begin(), sentence.end(), ' ') + 1;
+		return m;
+	}
 #endif // TEXT_STYLE
 
+#ifdef MY_RANGE
+class range_iterator {
+	size_t __position;
+public:
+	range_iterator(size_t __p) : __position{ __p } {}
+	range_iterator& operator++() {
+		++__position;
+		return *this;
+	}
+	size_t operator*() const {
+		return __position;
+	}
+	bool operator!=(const range_iterator& other) const {
+		return this->__position != other.__position;
+	}
+};
+
+class _myrange {
+	size_t __begin;
+	size_t __end;
+public:
+	explicit _myrange(size_t __b, size_t __e): __begin { __b },__end{__e} {}
+	range_iterator begin() const { return range_iterator{ __begin }; }
+	range_iterator end() const { return range_iterator{ __end }; }
+};
+#endif // MY_RANGE
+
+#ifdef COMPATIBLE_ITERATOR
+class range_iterator {
+	size_t __position;
+public:
+	range_iterator(size_t __p) : __position{ __p } {}
+	range_iterator& operator++() {
+		++__position;
+		return *this;
+	}
+	size_t operator*() const {
+		return __position;
+	}
+	bool operator!=(const range_iterator& other) const {
+		return this->__position != other.__position;
+	}
+	bool operator==(const range_iterator& other) const {
+		return !(*this != other);
+	}
+};
+
+namespace std {
+	template<>
+	struct iterator_traits<range_iterator> {
+		using iterator_category = std::output_iterator_tag;
+		using value_type = size_t;
+		using reference = range_iterator&;
+	};
+}
+
+class _myrange {
+	size_t __begin;
+	size_t __end;
+public:
+	explicit _myrange(size_t __b, size_t __e) : __begin{ __b }, __end{ __e } {}
+	range_iterator begin() const { return range_iterator{ __begin }; }
+	range_iterator end() const { return range_iterator{ __end }; }
+};
+#endif // COMPATIBLE_ITERATOR
+}
+
+
 int main() {
+
+	{
+#ifdef COMPATIBLE_ITERATOR
+	_myrange Range{ 20,30 };
+	auto it(find(begin(Range), end(Range), 21));
+	cout << *it;
+#endif // COMPATIBLE_ITERATOR
+
+#ifdef MY_RANGE
+	_myrange _Range{ 50,60 };
+	for (auto el : _Range) {
+		cout << el << endl;
+	}
+	return 0;
+#endif // MY_RANGE
+
 #ifdef ERASE_REMOVE
 	vector<coord> V{ {1.0,3.2},
 		{2.6,3.9},
@@ -341,5 +428,5 @@ while (!_pq.empty()) {
 	_pq.pop();
 }
 #endif // PRIORITY_QUEUE
-
+}
 }
