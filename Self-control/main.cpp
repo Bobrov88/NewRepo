@@ -22,13 +22,15 @@ using namespace std;
 //#define SELFMADE_TYPE
 //#define INSERT_UNIQUE
 //#define OPN
-//#define WORDS_IN_FILE
+//#define WORDS_IN_FILE 
 //#define TEXT_STYLE
 //#define PRIORITY_QUEUE
 //#define MY_RANGE
 //#define COMPATIBLE_ITERATOR
+//#define ADAPTORS_OF_ITERATORS
+//#define FIBONACCI_ITERATOR
 
-namespace self_copntrol {
+namespace self_control {
 #ifdef WORDS_IN_FILE
 	string _Trim(string & word) {
 		const char* symbols{ ",.:;()-" };
@@ -166,12 +168,42 @@ public:
 	range_iterator end() const { return range_iterator{ __end }; }
 };
 #endif // COMPATIBLE_ITERATOR
+
+#ifdef FIBONACCI_ITERATOR
+class Fib_it {
+	size_t a{ 0 };
+	size_t b{ 1 };
+	size_t i{ 0 };
+public:
+	Fib_it(size_t _i) : i{ _i } {}
+	Fib_it& operator++() {
+		size_t old_b{ b };
+		b += a;
+		a = old_b;
+		++i;
+		return *this;
+	}
+	bool operator!=(Fib_it& other) {
+		return this->i != other.i;
+	}
+	size_t operator*() const {
+		return this->b;
+	}
+};
+
+class Fib_range {
+	size_t _to;
+public:
+	Fib_range(size_t to) : _to(to) {}
+	Fib_it begin() const { return Fib_it{ 0 }; }
+	Fib_it end() const { return Fib_it{ _to }; }
+};
+#endif // FIBONACCI_ITERATOR
+
 }
 
-
 int main() {
-
-	{
+		{
 #ifdef COMPATIBLE_ITERATOR
 	_myrange Range{ 20,30 };
 	auto it(find(begin(Range), end(Range), 21));
@@ -428,5 +460,31 @@ while (!_pq.empty()) {
 	_pq.pop();
 }
 #endif // PRIORITY_QUEUE
+
+#ifdef ADAPTORS_OF_ITERATORS
+ifstream file("3.txt");
+istream_iterator<size_t> begin{ file };
+istream_iterator<size_t> end;
+deque<size_t> d;
+std::copy(begin, end, back_inserter(d));
+list<size_t> l{ 2, 64, 888 };
+std::copy(std::begin(l), std::end(l), front_inserter(d));
+initializer_list<int> I{ 1,3,56 };
+auto middle(next(std::begin(d), static_cast<size_t>(d.size() / 2)));
+std::copy(std::begin(I), std::end(I), inserter(d, middle));
+std::copy(std::begin(d), std::end(d), ostream_iterator<size_t>(cout, " "));
+#endif // ADAPTORS_OF_ITERATORS
+
+#ifdef FIBONACCI_ITERATOR
+for (const auto&& el : Fib_range{ 10 }) {
+	cout << el << endl;
 }
+#endif // FIBONACCI_ITERATOR
+}
+list<size_t> _l{ 1,2,3,4,5 };
+std::copy(make_reverse_iterator(end(_l)),
+	make_reverse_iterator(begin(_l)),
+		ostream_iterator<size_t>(std::cout, "-"));
+std::copy(rbegin(_l), rend(_l),
+	ostream_iterator<size_t>(std::cout, "-"));
 }
