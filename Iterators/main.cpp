@@ -7,6 +7,10 @@
 #include <deque>
 #include <iterator>
 #include <list>
+#include <vector>
+#include <numeric>	
+#include <valarray>
+#define _ITERATOR_DEBUG_LEVEL 2
 using namespace std;
 
 //#define simple_iterator
@@ -14,7 +18,9 @@ using namespace std;
 //#define FIBONACCI
 //#define iterator_adapters
 //#define reverse_iterator
-#define iterator_stopper
+//#define iterator_stopper
+//#define code_revise
+#define ZIP_iterator
 
 #ifdef iterator_to_stl
 class num_iterator {
@@ -135,58 +141,134 @@ public:
 };
 #endif // iterator_stopper
 
+#ifdef ZIP_iterator
+class zip_iterator {
+	using it_type = std::vector<double>::iterator;
+	it_type it1;
+	it_type it2;
+public:
+	zip_iterator(it_type iterator1, it_type iterator2)
+		: it1{ iterator1 }, it2{ iterator2 } {};
+	zip_iterator& operator++() {
+		++it1;
+		++it2;
+		return *this;
+	}
+	bool operator!=(const zip_iterator& other) const {
+		return it1 != other.it1 && it2 != other.it2;
+	}
+	bool operator==(const zip_iterator& other) const {
+		return !operator!=(other);
+	}
+	pair<double, double> operator*() {
+		return { *it1,*it2 };
+	}
+	};
 
-int main(int argc, char **argv)
+namespace std {
+	template<>
+	struct iterator_traits<zip_iterator> {
+		using iterator_category = std::forward_iterator_tag;
+		using value_type = std::pair<double, double>;
+		using reference = zip_iterator&;
+		using difference_type = long int;
+	};
+}
+
+class zipper {
+	using vec_type = std::vector<double>;
+	vec_type& vec1;
+	vec_type& vec2;
+public:
+	zipper(vec_type &va, vec_type &vb) 
+		: vec1{ va }, vec2{ vb } {}
+	zip_iterator begin() const {
+		return { std::begin(vec1), std::begin(vec2) };
+	}
+	zip_iterator end() const {
+		return { std::end(vec1), std::end(vec2) };
+	}
+
+};
+#endif // ZIP-iterator
+
+
+int main(/*int argc, char** argv*/)
 {
-	if (argc < 2) {
-		cout << "Please provide one parameter!" << endl;
-		return 1;
-	}
-	for (char c : cstring_range(argv[1])) {
-		cout << c;
-	}
-
-	ifstream file ("3.txt");
-	if (!file.is_open()) return -1;
+	{
+#ifdef iterator_stopper
+		if (argc < 2) {
+			cout << "Please provide one parameter!" << endl;
+			return 1;
+		}
+		for (char c : cstring_range(argv[1])) {
+			cout << c;
+		}
+#endif // iterator_stopper
 #ifdef simple_iterator
-	for (int i : num_range{ 100,110 }) {
-		std::cout << i << ", ";
-	}
-	cout << "\n";
+		for (int i : num_range{ 100,110 }) {
+			std::cout << i << ", ";
+		}
+		cout << "\n";
 #endif // simple_iterator
 #ifdef iterator_to_stl
-	num_range r{ 100,110 };
-	auto [min_it, max_it] (minmax_element(begin(r), end(r)));
-	cout << *min_it << " - " << *max_it << endl;
+		num_range r{ 100,110 };
+		auto [min_it, max_it](minmax_element(begin(r), end(r)));
+		cout << *min_it << " - " << *max_it << endl;
 #endif // iterator_to_stl
 #ifdef iterator_adapters
-	istream_iterator<int> it_cin{ file };
-	istream_iterator<int> end_cin;
-	deque<int> v;
-	copy(it_cin, end_cin, back_inserter(v));
-	istringstream sstr{ "123 456 789" };
-	auto deque_middle(next(begin(v), static_cast<int>(v.size()) / 2));
-	copy(istream_iterator<int>{sstr}, {}, inserter(v, deque_middle));
-	initializer_list<int> il2{ -1,-2,-3 };
-	copy(begin(il2), end(il2), front_inserter(v));
-	copy(begin(v), end(v), ostream_iterator<int>{cout, ", "});
-	cout << endl;
+		istream_iterator<int> it_cin{ file };
+		istream_iterator<int> end_cin;
+		deque<int> v;
+		copy(it_cin, end_cin, back_inserter(v));
+		istringstream sstr{ "123 456 789" };
+		auto deque_middle(next(begin(v), static_cast<int>(v.size()) / 2));
+		copy(istream_iterator<int>{sstr}, {}, inserter(v, deque_middle));
+		initializer_list<int> il2{ -1,-2,-3 };
+		copy(begin(il2), end(il2), front_inserter(v));
+		copy(begin(v), end(v), ostream_iterator<int>{cout, ", "});
+		cout << endl;
 #endif // iterator_adapters
 #ifdef FIBONACCI
-	for (size_t i : fib_range{ 10 }) {
-		cout << i << ", ";
-	}
-	cout << endl;
-	return 0;
+		for (size_t i : fib_range{ 10 }) {
+			cout << i << ", ";
+		}
+		cout << endl;
+		return 0;
 #endif // FIBONACCI
 #ifdef reverse_iterator
-	list<int> l{ 1,2,3,4,5 };
-	copy(rbegin(l), rend(l), ostream_iterator<int>(cout, ", "));
-	cout << endl;
-	copy(make_reverse_iterator(end(l)),
-		make_reverse_iterator(begin(l)),
-		ostream_iterator<int>(cout, ", "));
-	cout << endl;
+		list<int> l{ 1,2,3,4,5 };
+		copy(rbegin(l), rend(l), ostream_iterator<int>(cout, ", "));
+		cout << endl;
+		copy(make_reverse_iterator(end(l)),
+			make_reverse_iterator(begin(l)),
+			ostream_iterator<int>(cout, ", "));
+		cout << endl;
 #endif // reverse_iterator
+#ifdef code_revise
+		vector<int> v{ 1,2,3 };
+		v.shrink_to_fit();
+		const auto it(begin(v));
+		cout << *it << endl;
+		v.push_back(123);
+		cout << *it << endl;
+#endif // code_revise
+
+#ifdef ZIP_iterator	
+	using namespace std;
+	vector<double> a{ 1.0,2.0,3.0 };
+	vector<double> b{ 4.0,5.0,6.0 };
+	zipper zipped{ a,b };
+	const auto add_product([](double sum, const auto& p) {
+		return sum + p.first * p.second;
+		});
+	const auto dot_product(std::accumulate(begin(zipped), end(zipped), 0.0, add_product));
+	cout << dot_product << "\n";
+
+	valarray<double> aa{ 1.0,2.0,3.0 };
+	valarray<double> bb{ 4.0,5.0,6.0 };
+	cout << (aa * bb).sum() << endl;
+#endif // ZIP_iterator
+	}
 
 }

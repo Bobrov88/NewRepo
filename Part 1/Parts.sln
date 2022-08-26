@@ -21,6 +21,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Self-control", "..\Self-con
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Iterators", "..\Iterators\Iterators.vcxproj", "{DFB71BD7-CB1B-423E-8247-4B6BFA6705CB}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lambdas", "..\Lambdas\Lambdas.vcxproj", "{F7E248BB-BB72-438F-8268-DB60551DE3AF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -101,6 +103,14 @@ Global
 		{DFB71BD7-CB1B-423E-8247-4B6BFA6705CB}.Release|x64.Build.0 = Release|x64
 		{DFB71BD7-CB1B-423E-8247-4B6BFA6705CB}.Release|x86.ActiveCfg = Release|Win32
 		{DFB71BD7-CB1B-423E-8247-4B6BFA6705CB}.Release|x86.Build.0 = Release|Win32
+		{F7E248BB-BB72-438F-8268-DB60551DE3AF}.Debug|x64.ActiveCfg = Debug|x64
+		{F7E248BB-BB72-438F-8268-DB60551DE3AF}.Debug|x64.Build.0 = Debug|x64
+		{F7E248BB-BB72-438F-8268-DB60551DE3AF}.Debug|x86.ActiveCfg = Debug|Win32
+		{F7E248BB-BB72-438F-8268-DB60551DE3AF}.Debug|x86.Build.0 = Debug|Win32
+		{F7E248BB-BB72-438F-8268-DB60551DE3AF}.Release|x64.ActiveCfg = Release|x64
+		{F7E248BB-BB72-438F-8268-DB60551DE3AF}.Release|x64.Build.0 = Release|x64
+		{F7E248BB-BB72-438F-8268-DB60551DE3AF}.Release|x86.ActiveCfg = Release|Win32
+		{F7E248BB-BB72-438F-8268-DB60551DE3AF}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
