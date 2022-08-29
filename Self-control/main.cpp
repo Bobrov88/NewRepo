@@ -11,6 +11,7 @@
 #include <stdexcept>
 #include <stack>
 #include <queue>
+#include <numeric>
 using namespace std;
 
 //#define ERASE_REMOVE
@@ -29,6 +30,9 @@ using namespace std;
 //#define COMPATIBLE_ITERATOR
 //#define ADAPTORS_OF_ITERATORS
 //#define FIBONACCI_ITERATOR
+//#define REVERSE_ITERATOR
+//#define SENTINEL
+//#define ZIP_ITERATOR
 
 namespace self_control {
 #ifdef WORDS_IN_FILE
@@ -200,10 +204,80 @@ public:
 };
 #endif // FIBONACCI_ITERATOR
 
+#ifdef SENTINEL
+class sentinel {};
+class cstring_iterator {
+	const char* ch;
+public:
+	explicit cstring_iterator(const char* _ch) : ch(_ch) {}
+	char operator*() const {
+		return *ch;
+	}
+	bool operator!=(const sentinel) const {
+		return ch != nullptr && *ch != '\0';
+	}
+	cstring_iterator& operator++() {
+		++ch;
+		return *this;
+	}
+};
+class cstring {
+	const char* c;
+public:
+	cstring(const char* _c) : c(_c) {}
+	cstring_iterator begin() const { return cstring_iterator{ c }; }
+	sentinel end() const { return {}; }
+};
+#endif // SENTINEL
+
+#ifdef ZIP_ITERATOR
+
+class zip_iterator;
+
+namespace std {
+	template <>
+	struct iterator_traits<zip_iterator> {
+		using iterator_category = forward_iterator_tag;
+		using value_type = int;
+		using reference = zip_iterator&;
+	};
+}
+
+class zip_iterator {
+	using it = vector<int>::iterator;
+	it pa;
+	it pb;
+public:
+	zip_iterator(it _pa, it _pb) : pa{ _pa }, pb{ _pb }{}
+	zip_iterator& operator++() {
+		++pa;
+		++pb;
+		return *this;
+	}
+	bool operator!=(const zip_iterator& other) const {
+		return pa != other.pa && pb != other.pb;
+	}
+	pair<int, int> operator*() const {
+		return { *pa, *pb };
+	}
+};
+
+class zip {
+	vector<int>& a;
+	vector<int>& b;
+public:
+	zip(vector<int>& _a, vector<int>& _b) :
+		a{ _a }, b{ _b } {};
+	zip_iterator begin() const { return { a.begin(), b.begin() }; }
+	zip_iterator end() const { return { a.end(), b.end() }; }
+};
+#endif // ZIP_ITERATOR
+
 }
 
 int main() {
-		{
+
+	{
 #ifdef COMPATIBLE_ITERATOR
 	_myrange Range{ 20,30 };
 	auto it(find(begin(Range), end(Range), 21));
@@ -480,11 +554,44 @@ for (const auto&& el : Fib_range{ 10 }) {
 	cout << el << endl;
 }
 #endif // FIBONACCI_ITERATOR
-}
+
+#ifdef REVERSE_ITERATOR
 list<size_t> _l{ 1,2,3,4,5 };
 std::copy(make_reverse_iterator(end(_l)),
 	make_reverse_iterator(begin(_l)),
 		ostream_iterator<size_t>(std::cout, "-"));
 std::copy(rbegin(_l), rend(_l),
 	ostream_iterator<size_t>(std::cout, "-"));
+#endif // REVERSE_ITERATOR
+
+#ifdef SENTINEL
+cstring s("Sentinel");
+for (char c : s) {
+	cout << c;
+}
+cout << endl;
+#endif // SENTINEL
+
+#ifdef ITERATOR_DEBUG_LEVEL
+vector<int> v{ 1,2,3,4,5 };
+cout << v.capacity() << endl;
+auto _begin{ v.begin() };
+cout << *_begin << endl;
+v.push_back(123);
+v.shrink_to_fit();
+cout << v.capacity() << endl;
+cout << *_begin;
+#endif // ITERATOR_DEBUG_LEVEL
+
+#ifdef ZIP_ITERATOR
+vector<int> a{ 1,2,3 };
+vector<int> b{ 4,5,6 };
+zip __zip(a, b);
+auto _sum([](int sum, pair<int, int> p) {
+	return sum + p.first * p.second;
+	});
+const auto add_pr(accumulate(begin(__zip), end(__zip), 0, _sum));
+cout << add_pr;
+#endif // ZIP_ITERATOR
+}
 }
