@@ -12,6 +12,7 @@
 #include <stack>
 #include <queue>
 #include <numeric>
+#include <functional>
 using namespace std;
 
 //#define ERASE_REMOVE
@@ -33,6 +34,11 @@ using namespace std;
 //#define REVERSE_ITERATOR
 //#define SENTINEL
 //#define ZIP_ITERATOR
+//#define lambda_dynamic_definition
+//#define wrapped_lambda
+//#define concat_by_lambda
+//#define logical_concat
+#define calling_some_functions
 
 namespace self_control {
 #ifdef WORDS_IN_FILE
@@ -273,9 +279,73 @@ public:
 };
 #endif // ZIP_ITERATOR
 
+#ifdef wrapped_lambda
+auto consumer([=](auto& container) {
+	return [&](int i) {
+		container.push_back(i);
+	}; });
+
+auto print(const auto& container) {
+	for (auto& i : container)
+		cout << i << " ";
+	cout << endl;
+};
+#endif // wrapped_lambda
+
+#ifdef concat_by_lambda
+template <typename T, typename...Ts>
+static auto concat(T t, Ts...ts) {
+	if constexpr (sizeof...(ts) > 0) {
+		return [=](auto ...parameter) {
+			return t(concat(ts...)(parameter...));
+		};
+	}
+	else return t;
+}
+#endif // concat_by_lambda
+
+#ifdef logical_concat
+static bool begin_with_a(const string& word) {
+	return word.find('a') == 0;
+}
+static bool end_with_b(const string& word) {
+	return word.rfind('b') == word.length() - 1;
+}
+template <typename T, typename F1, typename F2>
+auto combine(T log_f, F1 f1, F2 f2) {
+	return [=](auto& parameters) {
+		return log_f(f1(parameters), f2(parameters));
+	};
+}
+#endif // logical_concat
 }
 
+#ifdef calling_some_functions
+static auto multicall(auto ...functions) {
+	return [=](auto x) {
+		(void)std::initializer_list<int> {
+			((void)functions(x), 0)...
+		};
+	};
+}
+static auto for_each(auto F, auto ...xs) {
+	(void)initializer_list<int> {
+		((void)F(xs), 0)...
+	};
+}
+
+#endif // calling_some_functions
+
+
 int main() {
+#ifdef calling_some_functions
+	auto brace1([](auto& letter) { cout << "[" << letter << "]"; });
+	auto brace2([](auto& letter) { cout << "(" << letter << ")"; });
+	auto brace3([](auto& letter) { cout << "{" << letter << "}"; });
+	auto nl([](auto) {cout << endl; });
+	auto call(multicall(brace1, brace2, brace3, nl));
+	for_each(call, 1, 2, 3, 4, 5);
+#endif // calling_some_functions
 
 	{
 #ifdef COMPATIBLE_ITERATOR
@@ -593,5 +663,55 @@ auto _sum([](int sum, pair<int, int> p) {
 const auto add_pr(accumulate(begin(__zip), end(__zip), 0, _sum));
 cout << add_pr;
 #endif // ZIP_ITERATOR
+
+#ifdef lambda_dynamic_definition
+auto _sum([](int x, int y) {return x + y; });
+cout << _sum(1, 4) << endl;
+auto _product_added([](const function<int(int, int)>& f) { return f(3, 4) * 4; });
+cout << _product_added(_sum) << endl;
+auto _product_advanced(
+	[=](int x, int y, int z) {
+		return _sum(x, y) * z;
+	});
+auto no_brackets([] {return "no brackets"; });
+auto param_at_once([](int x, int y) constexpr { return x * y; }(3, 2));
+cout << _product_advanced(3, 5, 7) << endl;
+cout << no_brackets() << endl;
+cout << param_at_once << endl;
+auto counter([count = 0]() mutable {return ++count; });
+cout << counter() << endl;
+cout << counter() << endl;
+cout << counter() << endl;
+#endif // lambda_dynamic_definition
+
+#ifdef wrapped_lambda
+list<int> l;
+vector<int> v;
+deque<int> d;
+initializer_list<function<void(int)>> consumers{
+	consumer(l), consumer(v),consumer(d) };
+for (int i{ 0 }; i < 5; ++i) {
+	for (auto&& el : consumers) {
+		el(i);
+	}
+}
+print(v);
+print(l);
+print(d);
+#endif // wrapped_lambda
+
+#ifdef concat_by_lambda
+auto twice([](int i) { return i * 2; });
+auto thrice([](int i) {return i * 3; });
+auto combined(concat(twice, thrice, std::plus<int>{}));
+std::cout << combined(2, 3) << endl;
+#endif // concat_by_lambda
+
+#ifdef logical_concat
+istream_iterator<string> it{ cin };
+istream_iterator<string> end;
+auto revise_word(combine(std::logical_and<>{}, begin_with_a, end_with_b));
+copy_if(it, end, ostream_iterator<string>{cout, ", "}, revise_word);
+#endif // logical_concat
 }
 }
