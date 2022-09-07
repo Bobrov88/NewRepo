@@ -19,8 +19,7 @@ using std::string;
 //#define difficult_predicate
 //#define unpacking_by_initializer
 //#define transform_if
-#define decart_set
-
+//#define decart_set
 
 #ifdef functional_polymorph
 static auto consumer(auto &container) {
@@ -120,12 +119,7 @@ static auto brace_print(char a, char b) {
 		});
 #endif // decart_set
 
-
 	int main() {
-
-#ifdef decart_set
-		cartesian(1, 2, 3);
-#endif // decart_set
 
 		{
 #ifdef function_dynamic_definition
@@ -204,6 +198,9 @@ static auto brace_print(char a, char b) {
 					));
 			std::cout << endl;
 #endif // transform_if
+#ifdef decart_set
+		cartesian(1, 2, 3);
+#endif // decart_set
 		}
 		return 1;
 	}
