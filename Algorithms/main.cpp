@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <algorithm>
 #include <vector>
 #include <map>
@@ -8,6 +9,8 @@
 #include <random>
 #include <sstream>
 #include <list>
+#include <functional>
+#include <iomanip>
 using namespace std;
 
 //#define copy_n_move
@@ -15,7 +18,18 @@ using namespace std;
 //#define remove_replace
 //#define transform_vector
 //#define find_equal_range
-#define minmax_clamp
+//#define minmax_clamp
+//#define boyer_moore
+//#define sample_
+//#define permutation
+
+#ifdef boyer_moore
+template <typename Itr>
+static void print(Itr it, size_t chars) {
+	copy_n(it, chars, ostream_iterator<char>{cout});
+	cout << endl;
+}
+#endif // boyer_moore
 
 #ifdef find_equal_range
 struct city {
@@ -84,6 +98,62 @@ static auto clampval(int min, int max) {
 
 int main()
 {
+
+#ifdef permutation
+	ifstream file("1.txt");
+	vector<string> v{ istream_iterator<string> {file}, {} };
+	sort(begin(v), end(v));
+	do {
+		copy(begin(v), end(v),
+			ostream_iterator<string>{cout, ", "});
+		cout << endl;
+	} while (next_permutation(begin(v), end(v)));
+#endif // permutation
+
+#ifdef sample_
+	const size_t data_points{ 100000 };
+	const size_t sample_points{ 100 };
+	const int mean{ 10 };
+	const int dev{ 3 };
+	random_device rd;
+	mt19937 gen{ rd() };
+	normal_distribution<> d{ mean,dev };
+	vector<int> v;
+	v.reserve(data_points);
+	generate_n(back_inserter(v), data_points, [&] {return d(gen); });
+	vector<int> samples;
+	v.reserve(sample_points);
+	sample(begin(v), end(v), back_inserter(samples), sample_points, mt19937{ random_device{}()});
+	map<int, size_t> hist;
+	for (int i : samples) {++hist[i];}
+	for (const auto& [value, count] : hist) {
+		cout << setw(2) << value << " " << string( count, 'x') << endl;
+	}
+#endif // sample_
+
+#ifdef boyer_moore
+	const string long_string{
+		"Lorem ipsum dolor sit amet, consetetur"
+		" sadipscing elitr, set diam nonumy eirmod" };
+	const string needle{ "elitr" };
+	{
+		auto match(search(begin(long_string), end(long_string), begin(needle), end(needle)));
+		print(match, 5);
+	}
+	{
+		auto match(search(begin(long_string), end(long_string), default_searcher(begin(needle), end(needle))));
+		print(match, 5);
+	}
+	{
+		auto match(search(begin(long_string), end(long_string), boyer_moore_searcher(begin(needle), end(needle))));
+		print(match, 5);
+	}
+	{
+		auto match(search(begin(long_string), end(long_string), boyer_moore_horspool_searcher(begin(needle), end(needle))));
+		print(match, 5);
+	}
+#endif // boyer_moore
+
 #ifdef minmax_clamp
 	vector<int> v{ 0,1000,5,250,300,800,900,321 };
 	const auto [min_it, max_it](
@@ -100,7 +170,6 @@ int main()
 	copy(begin(v_norm), end(v_norm), ostream_iterator<int>{cout, ", "});
 	cout << endl;
 #endif // minmax_clamp
-
 
 #ifdef find_equal_range
 	const vector<city> c {
