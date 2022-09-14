@@ -11,6 +11,7 @@
 #include <list>
 #include <functional>
 #include <iomanip>
+#include <deque>
 using namespace std;
 
 //#define copy_n_move
@@ -22,6 +23,7 @@ using namespace std;
 //#define boyer_moore
 //#define sample_
 //#define permutation
+//#define _merge
 
 #ifdef boyer_moore
 template <typename Itr>
@@ -96,8 +98,38 @@ static auto clampval(int min, int max) {
 }
 #endif // mixmax_clamp
 
+#ifdef _merge
+using dict_entry = pair<string, string>;
+namespace std {
+	ostream& operator<<(ostream& os, const dict_entry& p)
+	{
+		return os << p.first << " " << p.second;
+	}
+	istream& operator>>(istream& is, dict_entry& p)
+	{
+		return is >> p.first >> p.second;
+	}
+}
+template <typename IS>
+deque<dict_entry> from_instream(IS&& is) {
+	deque<dict_entry> d{ istream_iterator<dict_entry> {is}, {} };
+	sort(begin(d), end(d));
+	return d;
+	
+}
+#endif // _merge
+
 int main()
 {
+
+#ifdef _merge
+	const auto dict1(from_instream(ifstream{ "dict.txt" }));
+	const auto dict2(from_instream(cin));
+	//deque<dict_entry> dddd;
+	merge(begin(dict1), end(dict1), begin(dict2), end(dict2), ostream_iterator<dict_entry>{cout, "\n"});
+//	merge(begin(dict1), end(dict1), begin(dict2), end(dict2), back_insert_iterator(dddd));
+//	for (auto &&i : dddd) cout << i;
+#endif // _merge
 
 #ifdef permutation
 	ifstream file("1.txt");
@@ -289,7 +321,7 @@ int main()
 		[](const myStruct& lhs, const myStruct& rhs) {
 			return lhs._b < rhs._b;
 		});
-	for (const auto&a: mv) {
+	for (const auto& a : mv) {
 		cout << "{" << a._a << ", " << a._b << "}";
 	}
 	cout << endl;
@@ -317,4 +349,4 @@ int main()
 #endif // copy_n
 
 	return 1;
-}
+	}
