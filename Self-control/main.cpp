@@ -16,6 +16,9 @@
 #include <random>
 using namespace std;
 
+//#define _gather_
+//#define split__
+//#define trie_insert
 //#define ERASE_REMOVE
 //#define DELETING_O1
 //#define QUICK_SAFE_ACCESS
@@ -50,10 +53,100 @@ using namespace std;
 //#define sample_
 //#define permutation_
 //#define merge_dicts
-
+#define delete_spaces
+#ifdef delete_spaces
+template <typename It>
+It unique_space(It it, It it_end) {
+	auto bin_pred([](const char& first, const char& last) {
+		return first == ' ' && last == ' '; });
+	return unique(it, it_end, bin_pred);
+}
+#endif // delete_spaces
 
 
 namespace self_control {
+
+#ifdef _gather_
+	template <typename It, typename OutIt>
+	void gather(It it, It end_it, It border, OutIt out) {
+		auto is__([](auto a) {
+			return a == '_'; });
+		stable_partition(it, border, is__);
+		stable_partition(border, end_it, not_fn(is__));
+		copy(it, end_it, out);
+		*out++ = '\n';
+	}
+#endif // _gather_
+
+#ifdef split__
+template <typename It, typename C>
+void split(It it, It end_it, C ch) {
+	auto split_it(it);
+	while (it != end_it) {
+		split_it = find(it, end_it, ch);
+		if (split_it != end_it) {
+			copy(it, split_it, ostream_iterator<char>{cout});
+			cout << endl;
+			it = next(split_it);
+		}
+		else {
+			copy(it, end_it, ostream_iterator<char>{cout});
+			it = end_it;
+		}
+	}
+}
+#endif // split__
+
+#ifdef trie_insert
+	template <typename T>
+	class trie {
+		map<T, trie> trie_;
+	public:
+		template <typename It>
+		void insert(It it, It end_it) {
+			if (it == end_it) return;
+			trie_[*it].insert(next(it), end_it);
+		};
+
+		template <typename C>
+		void insert(const C& container) {
+			insert(begin(C), end(C));
+}
+
+		void insert(const initializer_list<T>&& il) {
+			insert(begin(il), end(il));
+		}
+
+		void print(vector<T>& v) const {
+			if (trie_.empty()) {
+				copy(begin(v), end(v),
+					ostream_iterator<string>{cout, " "});
+				cout << endl;
+			}
+			for (const auto& p : trie_) {
+				v.push_back(p.first);
+				p.second.print(v);
+				v.pop_back();
+			}
+		}
+		void print() const {
+			vector<T> v;
+			print(v);
+		}
+
+		template <typename It>
+		const trie subtrie(It it, It end_it) const {
+			if (it == end_it) return *this;
+			auto if_found(trie_.find(*it));
+			if (if_found == end(trie_)) return {};
+			return if_found->second.subtrie(next(it), end_it);
+		}
+
+		auto subtrie(const initializer_list<T>& il) const {
+			return	subtrie(begin(il), end(il));
+		}
+};
+#endif // trie
 
 #ifdef merge_dicts
 using dicts = std::pair<string, string>;
@@ -108,7 +201,7 @@ namespace std {
 	}
 #endif // WORDS_IN_FILE
 
-#ifdef  ERASE_REMOVE
+#ifdef ERASE_REMOVE
 	struct coord {
 		double x;
 		double y;
@@ -395,11 +488,47 @@ static auto for_each(auto F, auto ...xs) {
 }
 
 int main() {
-
-
-
+#ifdef delete_spaces
+	string s{ "  aaa   a a   a  a a a a " };
+	s.erase(unique_space(begin(s),end(s)), end(s));
+	cout << s;
+#endif // delete_spaces
 
 	{
+#ifdef _gather_
+	string a{ "ff_fg___Gg_ggggg__df______Dsf_" };
+	gather(begin(a),end(a), next(begin(a), size(a)/2),ostream_iterator<char>{cout});
+	gather(begin(a), end(a), end(a), ostream_iterator<char>{cout});
+	gather(begin(a), end(a), begin(a), ostream_iterator<char>{cout});
+	gather(begin(a), end(a), next(begin(a)), ostream_iterator<char>{cout});
+#endif // _gather_
+
+#ifdef split__
+	string to_split{ "a.d.v.g.d.g.t.e." };
+	split(begin(to_split), end(to_split), '.');
+#endif // split__
+
+#ifdef trie_insert
+	trie<string> t;
+	ifstream file("db.txt");
+	for (string line; getline(file, line);) {
+		istringstream iss{ line };
+		t.insert(istream_iterator<string>{iss}, {});
+	}
+	/*t.insert({"hi","hello","how", "are", "you"});
+	t.insert({ "hi", "how", "do", "you", "do" });
+	t.insert({ "what", "are", "you", "doing" });
+	t.insert({ "what","do","you","think" });
+	*/
+	t.print();
+	cout << endl;
+	string line;
+	getline(cin, line);
+	stringstream iss{ line };
+	auto found(t.subtrie(istream_iterator<string>{iss}, {}));
+	found.print();
+
+#endif // trie_insert
 
 #ifdef merge_dicts
 	ifstream i1{ "d1.txt" };

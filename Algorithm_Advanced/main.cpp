@@ -14,6 +14,7 @@
 #include <cmath>
 #include <corecrt_math_defines.h>
 #include <list>
+#include <deque>
 
 using namespace std;
 
@@ -23,7 +24,62 @@ using namespace std;
 //#define sum_error
 //#define mandelbrot
 //#define split_
-#define gather_
+//#define gather_
+//#define remove_multi_whitespace_
+//#define compress_and_decompress
+
+#ifdef compress_and_decompress
+
+void print(const auto& container) {
+	copy(begin(container), end(container), ostream_iterator<char>{cout});
+	cout << endl;
+}
+
+template<typename It>
+void compress(It it, It it_end) {
+	It next_block = it;
+	bool is_digit = false;
+	string compress_string{};
+	//deque<tuple<bool, char, size_t>> compress_string;
+	while (it != it_end) {
+		next_block = find_if(it, it_end, [&](auto i) {	return i != *it; });
+		compress_string += * it + to_string(next_block - it);
+		//if (isdigit(*it)) compress_string.push_back({true,)
+		it = next_block;
+	}
+	print(compress_string);
+}
+
+template<typename It>
+void decompress(It it, It it_end) {
+	stringstream __temp{ string{it,it_end} };
+	stringstream result;
+	char c;
+	size_t n;
+	while (__temp >> c >> n) {
+		result << string(n,c);
+	}
+	print(result.str());
+}
+
+void to_compress(string& to_compress) {
+	compress(begin(to_compress), end(to_compress));
+}
+
+void to_decompress(string& to_compress) {
+	decompress(begin(to_compress), end(to_compress));
+}
+
+#endif // compress_and_decompress
+
+#ifdef remove_multi_whitespace_
+template <typename It>
+It remove_multi_whitespace(It it, It end_it) {
+	return unique(it, end_it, [](const auto& a, const auto& b) {
+		return isspace(a) && isspace(b);
+		});
+}
+#endif // remove_multi_whitespace_
 
 #ifdef gather_
 template <typename It, typename F>
@@ -40,8 +96,6 @@ void gather_sort(It first, It last, It gather_pos, F comp_func) {
 	stable_sort(gather_pos, last, comp_func);
 }
 #endif // gather_
-
-
 
 #ifdef split_
 	template <typename InIt, typename OutIt, typename T, typename F>
@@ -270,6 +324,22 @@ public:
 #endif // substr_search
 
 int main() {
+
+#ifdef compress_and_decompress
+	string s{ "a00000" };
+	to_compress(s);
+	string ss{ "a105" };
+	to_decompress(ss);
+#endif // compress_and_decompress
+
+
+#ifdef remove_multi_whitespace_
+	string s{ "fooo        bar     \t     baz" };
+	cout << s << endl;
+	s.erase(remove_multi_whitespace(begin(s), end(s)), end(s));
+	cout << s << endl;
+#endif // remove_multi_whitespace_
+
 #ifdef gather_
 	auto is_a([](char c) { return c == 'a'; });
 	string a{ "a_a_a_a_a_a_a_a_a_a" };
@@ -288,7 +358,6 @@ int main() {
 	rotate(begin(a), begin(a) + 1, end(a));
 	cout << a << endl;
 #endif // gather_
-
 
 #ifdef split_
 	const string s{ "a-b-c-d-e-f-g" };
