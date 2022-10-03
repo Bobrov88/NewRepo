@@ -6,13 +6,81 @@
 #include <algorithm>
 #include <iterator>
 #include <cctype>
+#include <locale>
+#include <iomanip>
+#include <vector>
+#include <map>
+#include <numeric>
 using namespace std;
 
 //#define ostringstream_
 //#define trim_spaces
 //#define stringview 
 //#define user_entering_data
-#define words_in_sentences
+//#define words_in_sentences
+//#define output_formatting
+
+//#define output_overload
+#define istream_into_map
+
+#ifdef istream_into_map
+struct meme {
+	string description;
+	size_t year;
+};
+
+istream& operator>>(istream& is, meme& m) {
+	return is >> quoted(m.description) >> m.year;
+}
+
+istream& operator>>(istream& is,
+	pair<string, meme>& p) {
+	return is >> quoted(p.first) >> p.second;
+}
+#endif // istream_into_map
+
+
+#ifdef output_overload
+struct city {
+	string name;
+	size_t population;
+	double latitude;
+	double longitude;
+};
+
+istream& operator>>(istream&, city&);
+
+istream& operator++(istream& is) {
+	is.clear();
+	is.ignore(std::numeric_limits<std::streamsize>::max());
+//	is.ignore(std::numeric_limits<std::streamsize>::max());
+	return is;
+}
+
+istream& operator>>(istream& is, city& c) {
+	is >> ws;
+	getline(is, c.name);
+	is >> c.population
+		>> c.latitude
+		>> c.longitude;
+	if (!is && !is.eof()) ++is;
+	return is;
+}
+
+#endif // output_overload
+
+#ifdef output_formatting
+void print_aligned_demo(int val,
+						size_t width,
+						char fill_char = ' ')
+{
+	cout << "=================\n";
+	cout << setfill(fill_char);
+	cout << left << setw(width) << val << '\n';
+	cout << right << setw(width) << val << '\n';
+	cout << internal << setw(width) << val << '\n';
+}
+#endif // output_formatting
 
 #ifdef words_in_sentences
 template <typename T>
@@ -20,7 +88,6 @@ size_t wordcount(T& is) {
 	return distance(istream_iterator<string> {is}, {});
 }
 #endif // words_in_sentences
-
 
 #ifdef stringview
 void print(string_view v) {
@@ -45,7 +112,67 @@ string trim_whitespaces_surrounding(const string& s) {
 }
 #endif // trim_spaces
 
-//int main() {
+int main() {
+
+#ifdef istream_into_map
+	ifstream file{ "2.txt" };
+	map<string, meme> m;
+	copy(istream_iterator<pair<string, meme>> {file},
+		{},
+		inserter(m, end(m)));
+
+	auto max_func([](size_t old_max,
+		const auto& b) {
+			return max(old_max, b.first.length());
+		});
+	size_t width{ accumulate(begin(m),end(m),
+		0u, max_func) };
+
+	for (const auto& [meme_name, meme_desc] : m) {
+		const auto& [desc, year] = meme_desc;
+		cout << left << setw(width) << meme_name
+			<< " : " << desc
+			<< " , " << year << '\n';
+	}
+#endif // istream_into_map
+
+
+#ifdef output_overload
+	vector<city> l;
+	ifstream file{ "1.txt" };
+	copy(istream_iterator<city> {file}, {}, back_inserter(l));
+	for (const auto& [name, pop, lat, lon] : l) {
+		cout << left << setw(20) << name
+			<< " population=" << pop <<'\t'
+			<< " lat=" << lat << '\t'
+			<< " lon=" << lon << '\n';
+	}
+#endif // output_overload
+
+#ifdef output_formatting
+	print_aligned_demo(123456, 15);
+	print_aligned_demo(123456, 15, '_');
+
+	cout << hex << showbase;
+	print_aligned_demo(0x123abc, 15);
+	cout << oct;
+	print_aligned_demo(0123456, 15);
+
+	cout << "A hex number with upper case letters: "
+		<< hex << uppercase << 0x12abc << '\n';
+	cout << "A number: " << 100 << '\n';
+	cout << dec;
+	cout << "Oops. now in decimal again: " << 100 << '\n';
+	cout << "doubles: " << 12.3 << " " << 12.0 << ", " << showpoint << 12.0 << '\n';
+	cout << "scientific double: " << hexfloat
+		<< 12300000000.123 << '\n';
+	cout << "fised      double " << fixed
+		<< 12300000000.123 << '\n';
+	cout << "Very precise double: "
+		<< setprecision(10) << 0.000000001 << '\n';
+	cout << "Less precise double: "
+		<< setprecision(1) << showpos<<0.000000001 << '\n';
+#endif // output_formatting
 
 #ifdef words_in_sentences
 int main(int argc, char** argv) {
@@ -59,7 +186,6 @@ int main(int argc, char** argv) {
 	}
 	cout << "There are " << wc << " words\n";
 #endif // words_in_sentences
-
 
 #ifdef user_entering_data
 		cout << "Please enter two numbers:\n";
